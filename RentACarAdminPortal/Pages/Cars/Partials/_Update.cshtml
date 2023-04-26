@@ -1,0 +1,100 @@
+﻿<div id="updateCarModal" class="modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Araba Güncelle</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="brand">Marka</label>
+                        <select name="brand" class="form-control">
+                            <option>Audi</option>
+                            <option>BMW</option>
+                            <option>Mercedes</option>
+                            <option>Skoda</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="model">Model</label>
+                        <input name="model" type="text" class="form-control">
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="year">Yıl</label>
+                        <select name="year" class="form-control">
+                            <option>2020</option>
+                            <option>2019</option>
+                            <option>2018</option>
+                        </select>
+                    </div>
+                    <div class="form-group col-md-12">
+                        <label for="plate">Plaka</label>
+                        <input name="plate" type="text" class="form-control">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="updateCar();">Save changes</button>
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+    var $updateCarModal = $("#updateCarModal");
+
+    var carId;
+    function getSelectedCar(_carId) {
+        carId = _carId;
+
+        $.ajax({
+            url: portalApiEndpoint + '/cars/' + carId,
+            type: 'GET',
+            contentType: 'application/json; charset=utf-8',
+            success: function (result) {
+
+                $updateCarModal.find("select[name='brand']").val(result.brand);
+                $updateCarModal.find("input[name='model']").val(result.model);
+                $updateCarModal.find("select[name='year']").val(result.year);
+                $updateCarModal.find("input[name='plate']").val(result.plate);
+                
+            },
+            error: function (xhr, status, error) {
+                alert("Hata Oluştu!");
+            }
+        });
+    }
+
+    function updateCar() {
+
+        $.ajax({
+            url: portalApiEndpoint + '/cars/' + carId,
+            type: 'PUT',
+            contentType: 'application/json; charset=utf-8',
+            data: JSON.stringify({
+                brand: $updateCarModal.find("select[name='brand']").val(),
+                model: $updateCarModal.find("input[name='model']").val(),
+                year: $updateCarModal.find("select[name='year']").val(),
+                plate: $updateCarModal.find("input[name='plate']").val()
+            }),
+            complete: function (result) {
+                $('.modal-footer button').removeClass("disabled");
+                hideModalLoading("updateCarModal");
+            },
+            success: function (result) {
+                //alert("Araç Oluşturuldu");
+                $('#updateCarModal').modal('toggle');
+                searchCar();
+            },
+            error: function (xhr, status, error) {
+                alert("Hata Oluştu!");
+            }
+        });
+    }
+
+</script>

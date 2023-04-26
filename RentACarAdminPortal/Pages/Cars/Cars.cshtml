@@ -1,0 +1,66 @@
+﻿@page "/cars"
+@model RentACarAdminPortal.Pages.CarsModel
+
+    <div class="pageTitle">Araçlar <button type="button" class="btn btn-primary new" data-toggle="modal" data-target="#newCarModal">Yeni Araç Ekle</button></div>
+
+    <table id="cars" cellpadding="0" cellspacing="0" class="myTable">
+        <thead>
+            <tr>
+                <th>Marka</th>
+                <th>Model</th>
+                <th>Yıl</th>
+                <th>Plaka</th>
+                <th style="width:75px;"></th>
+            </tr>
+        </thead>
+        <tbody>
+        </tbody>
+    </table>
+
+    <template id="carsRowTemplate">
+        <tr>
+            <td>#Brand#</td>
+            <td>#Model#</td>
+            <td>#Year#</td>
+            <td>#Plate#</td>
+            <td><a href="#" onclick="getSelectedCar(#CarId#);" data-toggle="modal" data-target="#updateCarModal">Düzenle</a></td>
+        </tr>
+    </template>
+
+
+    <partial name="Partials/_New" />
+    <partial name="Partials/_Update" />
+
+    <script>
+
+        function searchCar() {
+
+            $.ajax({
+                url: portalApiEndpoint + '/cars',
+                type: 'GET',
+                contentType: 'application/json; charset=utf-8',
+                success: function (result) {
+
+                    $("#cars tbody tr").remove();
+                    $(result.cars).each(function (index, value) {
+
+                        var carsRowTemplate = $("template#carsRowTemplate").html();
+
+                        carsRowTemplate = carsRowTemplate.replace("#CarId#",value.id);
+                        carsRowTemplate = carsRowTemplate.replace("#Brand#",value.brand);
+                        carsRowTemplate = carsRowTemplate.replace("#Model#",value.model);
+                        carsRowTemplate = carsRowTemplate.replace("#Year#",value.year);
+                        carsRowTemplate = carsRowTemplate.replace("#Plate#", value.plate);
+
+                        $("#cars tbody").append(carsRowTemplate);
+                    });
+                },
+                error: function (xhr, status, error) {
+                    alert("Hata Oluştu!");
+                }
+            });
+        }
+
+        searchCar();
+
+    </script>
